@@ -2,14 +2,15 @@ import { fetchInventory } from './src/services/amazonApiService.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
-exports.handler = async () => {
+export const handler = async (event) => {
     try {
-        await fetchInventory();
+        console.log("Event:", event);
 
+        const data = await fetchInventory();
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: "Inventory fetched and stored in database successfully",
+                message: `Inventory fetched and stored in database successfully. Total items processed: ${data.length}`,
             }),
         };
     } catch (error) {

@@ -1,0 +1,37 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Transform": "AWS::Serverless-2016-10-31",
+    "Description": "SAM Template to deploy an Lambda function",
+    "Resources": {
+        "AmazonListingProcessingLambda": {
+            "Type": "AWS::Serverless::Function",
+            "Properties": {
+                "FunctionName": "AmazonListingProcessingLambda",
+                "Handler": "index.handler",
+                "Runtime": "nodejs20.x",
+                "CodeUri": ".",
+                "MemorySize": 128,
+                "Timeout": 900,
+                "Environment": {
+                    "Variables": {
+                        "AWS_ACCESS_KEY_ID": "${ACCESS_KEY_ID}",
+                        "AWS_SECRET_ACCESS_KEY": "${SECRET_ACCESS_KEY}",    
+                        "REGION": "us-east-1",
+                        "SESSION_SECRET": "c714c86e-d3ab-4650-8f22-6cdef060b2d8",
+                        "NODE_ENV": "production",
+                        "DYNAMODB_TABLE_NAME":"dpal_order_items",
+                        "AMAZON_SP_CLIENT_ID":"${AMAZON_SP_CLIENT_ID}",
+                        "AMAZON_SP_CLIENT_SECRET": "${AMAZON_SP_CLIENT_SECRET]",
+                        "AMAZON_SP_REGION": "na"
+                    }
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "LambdaFunction": {
+            "Description": "Lambda Function ARN",
+            "Value": { "Fn::GetAtt": ["AmazonListingProcessingLambda", "Arn"] }
+        }
+    }
+}
