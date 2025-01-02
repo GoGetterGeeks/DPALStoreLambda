@@ -32,6 +32,7 @@ export const insertAmazonData = async (dataList) => {
                                 earliestShipDate: item.earliestShipDate,
                                 shippingAddress: item.shippingAddress,
                                 status: item.status,
+                                scrappedStatus: "No",
                             },
                         },
                     })),
