@@ -21,9 +21,9 @@ export const insertAmazonData = async (dataList) => {
                     latestShipDate: item.latestShipDate,
                     earliestShipDate: item.earliestShipDate,
                     shippingAddress: item.shippingAddress,
-                    status: item.status,
+                    status: item.status ? item.status.toLowerCase() : null,
                     scrappedStatus: "No",
-                    gpk: item.status,
+                    gpk: item.status ? item.status.toLowerCase() : null,
                     gsk: "No",
                 },
                 ConditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)", // Ensure no duplicate entry
