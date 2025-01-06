@@ -6,8 +6,6 @@ dotenv.config();
 const tableName = process.env.DYNAMODB_TABLE_NAME;
 
 export const insertAmazonData = async (dataList) => {
-    console.log("Inserting data to DB...");
-
     try {
         for(const item of dataList) {
             const params = {

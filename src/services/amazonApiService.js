@@ -73,17 +73,17 @@ export const fetchInventoryAndInsert = async () => {
         let storeData = [];
         for (const order of response.Orders) {
             const orderItems = await fetchOrderItems(sellingPartner, order.AmazonOrderId);
-            for (const orderItem of orderItems) {
+            orderItems.forEach(orderItem => {
                 storeData.push(processOrderData(order, orderItem));
-            }
+            });
         }
 
-        console.log("store data  -->  ", storeData)
+        console.log("Fetched store data, inserting into database"); 
         await insertAmazonData(storeData);
 
         return storeData;
     } catch (e) {
-        console.error("Unable to fetch orders from Amazon");
+        console.error("Unable to fetch or insert orders from Amazon");
         console.error(e);
         throw e;
     }
@@ -93,8 +93,6 @@ export const fetchUnshippedOrdersAndUpdate = async () => {
     try {
         const unshippedOrders = await getByStatus("unshipped");
         const amazonOrderIds = unshippedOrders.map(order => order.amazonOrderId);
-
-        console.log("unshipped amazon ids -> ", amazonOrderIds)
 
         if (amazonOrderIds.length === 0) {
             console.log("No unshipped orders found.");
@@ -112,7 +110,7 @@ export const fetchUnshippedOrdersAndUpdate = async () => {
             }
         };
 
-        console.log('Fetching inventory to check status');
+        console.log("Fetching unshipped orders from Amazon");
         let response = await sellingPartner.callAPI(query);
 
         for (const order of response.Orders) {
@@ -134,13 +132,13 @@ export const fetchUnshippedOrdersAndUpdate = async () => {
                     await updateOrderItemData(orderItem, order.AmazonOrderId, currentStatus.toLowerCase());
                     console.log(`Updated status for Order ID ${order.AmazonOrderId} to ${currentStatus.toLowerCase()}.`);
                 } else {
-                    console.log(`No missmatch found`);
+                    console.log(`No mismatch found for Order ID ${order.AmazonOrderId}`);
                 }
             }
         }
 
     } catch (e) {
-        console.error("Unable to fetch orders from Amazon");
+        console.error("Unable to fetch or update orders from Amazon");
         console.error(e);
         throw e;
     }
