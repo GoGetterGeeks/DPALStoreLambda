@@ -1,4 +1,4 @@
-import { fetchInventory } from './src/services/amazonApiService.js';
+import { fetchInventoryAndInsert, fetchUnshippedOrdersAndUpdate } from './src/services/amazonApiService.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -6,7 +6,9 @@ export const handler = async (event) => {
     try {
         console.log("Event:", event);
 
-        const data = await fetchInventory();
+        await fetchUnshippedOrdersAndUpdate();
+
+        const data = await fetchInventoryAndInsert();
         return {
             statusCode: 200,
             body: JSON.stringify({
