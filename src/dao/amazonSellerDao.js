@@ -19,10 +19,9 @@ export const insertAmazonData = async (dataList) => {
                     latestShipDate: item.latestShipDate,
                     earliestShipDate: item.earliestShipDate,
                     shippingAddress: item.shippingAddress,
-                    status: item.status ? item.status.toLowerCase() : null,
-                    scrappedStatus: "No",
-                    gpk: item.status ? item.status.toLowerCase() : null,
-                    gsk: "No",
+                    orderStatus: item.orderStatus ? item.orderStatus.toLowerCase() : null,
+                    gpk: "unshipped_unscrapped",
+                    gsk: item.purchaseDate,
                 },
                 ConditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)", // Ensure no duplicate entry
             };
@@ -74,7 +73,7 @@ export const getByStatus = async (status) => {
             personalization: item.personalization || null,
             option: item.option || null,
             shipTo: item.shipTo || null,
-            status: item.status || null
+            orderStatus: item.orderStatus || null
         }));
 
         console.info(`Fetched ${orderItemDataList.length} order items by status ${status} from DB`);
@@ -85,19 +84,21 @@ export const getByStatus = async (status) => {
     }
 };
 
-export const updateOrderItemData = async (orderItemData, amazonOrderId,  newStatus) => {
+export const updateOrderItemData = async (orderItemData, amazonOrderId, newStatus) => {
     const params = {
         TableName: tableName,
         Key: {
             pk: amazonOrderId, 
             sk: orderItemData.OrderItemId  
         },
-        UpdateExpression: "set #status = :status",
+        UpdateExpression: "set #orderStatus = :orderStatus, #gpk = :gpk",
         ExpressionAttributeNames: {
-            "#status": "status",
+            "#orderStatus": "orderStatus",
+            "#gpk": "gpk",
         },
         ExpressionAttributeValues: {
-            ":status": newStatus,
+            ":orderStatus": newStatus,
+            ":gpk": newStatus,
         },
         ReturnValues: "UPDATED_NEW"
     };

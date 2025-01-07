@@ -46,7 +46,7 @@ const processOrderData = (order, orderItem) => ({
     latestShipDate: order.LatestShipDate,
     earliestShipDate: order.EarliestShipDate,
     shippingAddress: order.ShippingAddress,
-    status: AMAZON_ORDER_STATUS_TO_DPAL_STATUS_MAP.get(order.OrderStatus),
+    orderStatus: AMAZON_ORDER_STATUS_TO_DPAL_STATUS_MAP.get(order.OrderStatus),
 });
 
 export const fetchInventoryAndInsert = async () => {
@@ -78,7 +78,7 @@ export const fetchInventoryAndInsert = async () => {
             });
         }
 
-        console.log("Fetched store data, inserting into database"); 
+        console.log(`Fetched ${storeData.length} store data, inserting into database`); 
         await insertAmazonData(storeData);
 
         return storeData;
@@ -89,9 +89,26 @@ export const fetchInventoryAndInsert = async () => {
     }
 };
 
+const fetchOrdersByMultipleStatuses = async () => {
+    try {
+        const [scrappedOrders, unscrappedOrders] = await Promise.all([
+            getByStatus("unshipped_scrapped"),
+            getByStatus("unshipped_unscrapped"),
+        ]);
+
+        const allOrders = [...scrappedOrders, ...unscrappedOrders];
+
+        console.log(`Fetched ${allOrders.length} total orders.`);
+        return allOrders;
+    } catch (error) {
+        console.error('Error fetching orders by multiple statuses:', error);
+        throw error;
+    }
+};
+
 export const fetchUnshippedOrdersAndUpdate = async () => {
     try {
-        const unshippedOrders = await getByStatus("unshipped");
+        const unshippedOrders = await fetchOrdersByMultipleStatuses();
         const amazonOrderIds = unshippedOrders.map(order => order.amazonOrderId);
 
         if (amazonOrderIds.length === 0) {
@@ -123,10 +140,10 @@ export const fetchUnshippedOrdersAndUpdate = async () => {
                 if (!localOrder) continue;
 
                 const currentStatus = order.OrderStatus;
-                if (localOrder.status !== currentStatus.toLowerCase()) {
+                if (localOrder.orderStatus !== currentStatus.toLowerCase()) {
                     console.log(
                         `Status change detected for Order ID ${order.AmazonOrderId}: ` +
-                        `Local: ${localOrder.status}, Amazon: ${currentStatus}`
+                        `Local: ${localOrder.orderStatus}, Amazon: ${currentStatus}`
                     );
 
                     await updateOrderItemData(orderItem, order.AmazonOrderId, currentStatus.toLowerCase());
