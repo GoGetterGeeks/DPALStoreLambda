@@ -13,16 +13,22 @@
                 "MemorySize": 128,
                 "Timeout": 900,
                 "Environment": {
-                    "Variables": {
-                        "AWS_ACCESS_KEY_ID": "${ACCESS_KEY_ID}",
-                        "AWS_SECRET_ACCESS_KEY": "${SECRET_ACCESS_KEY}",    
+                    "Variables": {   
                         "REGION": "us-east-1",
                         "SESSION_SECRET": "c714c86e-d3ab-4650-8f22-6cdef060b2d8",
                         "NODE_ENV": "production",
-                        "DYNAMODB_TABLE_NAME":"dpal_order_items",
-                        "AMAZON_SP_CLIENT_ID":"${AMAZON_SP_CLIENT_ID}",
+                        "DYNAMODB_TABLE_NAME": "dpal_order_items",
+                        "AMAZON_SP_CLIENT_ID": "${AMAZON_SP_CLIENT_ID}",
                         "AMAZON_SP_CLIENT_SECRET": "${AMAZON_SP_CLIENT_SECRET]",
                         "AMAZON_SP_REGION": "na"
+                    }
+                },
+                "Events": {
+                    "ScheduleEvent": {
+                        "Type": "Schedule",
+                        "Properties": {
+                            "Schedule": "rate(10 minutes)"
+                        }
                     }
                 }
             }
